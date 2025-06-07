@@ -44,7 +44,7 @@ class GameViewController: UIViewController {
     }
     @objc func update() {
         if let accelerometerData = motionManager.accelerometerData {
-            print(accelerometerData, motionManager.gyroData ?? 0)
+            //print(accelerometerData, motionManager.gyroData ?? 0)
             myLabel.text=(
                 "x:" + String(format: "%f",(accelerometerData.acceleration.x)) +
                 "\ny:" + String(format: "%f",(accelerometerData.acceleration.y)) +
@@ -57,7 +57,7 @@ class GameViewController: UIViewController {
             )
         }
         if let gyroData = motionManager.gyroData {
-            print(motionManager.accelerometerData ?? 0, gyroData)
+            //print(motionManager.accelerometerData ?? 0, gyroData)
         }
     }
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {

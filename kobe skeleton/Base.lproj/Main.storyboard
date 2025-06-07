@@ -8,16 +8,25 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Game View Controller-->
+        <!--Disclaimer-->
         <scene sceneID="tXr-a1-R10">
             <objects>
-                <viewController id="BV1-FR-VrT" customClass="GameViewController" customModule="kobe_skeleton" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Disclaimer" id="BV1-FR-VrT" customClass="GameViewController" customModule="kobe_skeleton" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" id="3se-qz-xqx" customClass="SKView">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="21C-SX-xuz">
+                                <rect key="frame" x="157" y="758" width="78" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Accept"/>
+                                <connections>
+                                    <segue destination="a0M-1t-vgL" kind="show" id="1xk-Bt-7w4"/>
+                                </connections>
+                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Acceleration XYZ" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zNt-S3-ucV">
-                                <rect key="frame" x="16" y="71" width="361" height="331"/>
+                                <rect key="frame" x="49" y="127" width="361" height="331"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -34,6 +43,22 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="19.083969465648853" y="-2.1126760563380285"/>
+        </scene>
+        <!--Accepted-->
+        <scene sceneID="1rU-Ny-ocP">
+            <objects>
+                <viewController title="Accepted" modalTransitionStyle="crossDissolve" modalPresentationStyle="fullScreen" id="a0M-1t-vgL" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="zxz-bG-fZX">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="XeH-Xg-dYz"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="fo2-Dk-XJ0"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Qne-qa-Vhj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="798" y="-2"/>
         </scene>
     </scenes>
     <resources>
