@@ -32,12 +32,18 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="cone.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Jcw-M2-7ig">
+                                <rect key="frame" x="49" y="594" width="303" height="149"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4qk-I5-YsI"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
+                        <outlet property="myButton" destination="21C-SX-xuz" id="441-vg-fye"/>
                         <outlet property="myLabel" destination="zNt-S3-ucV" id="BwT-iq-MVD"/>
+                        <outlet property="spinDecal" destination="Jcw-M2-7ig" id="O4M-u4-3Dg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
@@ -62,6 +68,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="cone.fill" catalog="system" width="128" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
