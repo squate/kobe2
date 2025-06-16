@@ -15,10 +15,11 @@ import CoreMotion
 class GameViewController: UIViewController {
     @IBOutlet weak var myLabel: UILabel! // This is your outlet
     @IBOutlet weak var myButton: UIButton! // This is your outlet
-
+    @IBOutlet weak var spinDecal: UIImageView!
     let motionManager = CMMotionManager()
     var timer: Timer!
     var up = false
+    var freeSpin = false
     var (t0, t1, air, best) = (0, 0, 0, 0) //times to ascertain throw air/ record
     var (aX, aY, aZ) = (0.0, 0.0, 0.0) //accelerometer axes
     var (gX, gY, gZ) = (0.0, 0.0, 0.0) //gyroscope axes
@@ -27,6 +28,8 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        spinDecal.image = spinDecal.image?.withRenderingMode(.alwaysTemplate)
+        spinDecal.tintColor = UIColor.black
         motionManager.startAccelerometerUpdates()
         motionManager.startGyroUpdates()
         //motionManager.startMagnetometerUpdates()
@@ -99,6 +102,7 @@ class GameViewController: UIViewController {
                 //TODO: determine if throw meets quest parameters, win or lose
                 //TODO: UNINVERT COLORS
                 myButton.tintColor = UIColor.black
+                spinDecal.tintColor = UIColor.black
                 up = false
                 if (air > 50){
                     myLabel.text=(
@@ -125,6 +129,17 @@ class GameViewController: UIViewController {
             gY = gyroData.rotationRate.y
             gZ = gyroData.rotationRate.z
             
+            /* gyro raw logging
+            myLabel.text=(
+                "gX:" + String(format: "%f",gX) +
+                "\ngY:" + String(format: "%f",gY) +
+                "\ngZ:" + String(format: "%f",gZ)
+            )
+            */
+            
+            //min: -36 max: 36
+            //red: gX
+            
             gPrevMag = gMag
             gMag = ( gX*gX + gY*gY + gZ*gZ )
             
@@ -138,12 +153,15 @@ class GameViewController: UIViewController {
                 /*TODO: set tint until land in a way that doesn't constantly check.
                  saucy responsive and efficient. noticeable on rapidly spinning device
                 options:
+                 
                 //color per axis,
                 //color per axis direction
                 //xyz -> rgb, twirl-> saturation, aNMax -> brightness)?
                 */
-
+                freeSpin = true
                 up = true
+                
+                spinDecal.tintColor = UIColor(red: (gX+36)/72.0, green: (gY+36)/72.0, blue: (gZ+36)/72.0, alpha: twirl/3888.0)//todo: set based on gyro data, map
             }
         }
     }
