@@ -16,15 +16,22 @@ class GameViewController: UIViewController {
     @IBOutlet weak var myLabel: UILabel! // This is your outlet
     let motionManager = CMMotionManager()
     var timer: Timer!
+    var up = false
+    var (t0, t1, a, best) = (0, 0, 0, 0) //times to ascertain throw air/ record
+    var (aX, aY, aZ) = (0.0, 0.0, 0.0) //accelerometer axes
+    var (gX, gY, gZ) = (0.0, 0.0, 0.0) //gyroscope axes
+    var (aN, aMaxN, aLastMaxN) = (0.0, 0.0, 0.0) //magnitude of accelerometer and related vars
+    var (gMag, gPrevMag, twirl) = (0.0, 0.0, 0.0) //as above w/ gyroscope
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         motionManager.startAccelerometerUpdates()
         motionManager.startGyroUpdates()
-        motionManager.startMagnetometerUpdates()
-        motionManager.startDeviceMotionUpdates()
+        //motionManager.startMagnetometerUpdates()
+        //motionManager.startDeviceMotionUpdates()
         myLabel.numberOfLines=4
         
-        timer = Timer.scheduledTimer(timeInterval: 1.0/50.0, target: self, selector: #selector(GameViewController.update), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 1.0/1000.0, target: self, selector: #selector(GameViewController.update), userInfo: nil, repeats: true)
         
         if let view = self.view as! SKView? {
             // Load the SKScene from 'GameScene.sks'
@@ -37,29 +44,111 @@ class GameViewController: UIViewController {
             }
             
             view.ignoresSiblingOrder = true
-            
+
             view.showsFPS = true
             view.showsNodeCount = true
         }
     }
+    //taking in and using sensor data to parse throws
     @objc func update() {
         if let accelerometerData = motionManager.accelerometerData {
             //print(accelerometerData, motionManager.gyroData ?? 0)
+            
+            //set accel vars to sensor data
+            aX = accelerometerData.acceleration.x
+            aY = accelerometerData.acceleration.y
+            aZ = accelerometerData.acceleration.z
+            aN = ( aX*aX + aY*aY + aZ*aZ ) //magnitude of acceleration
+            
+            //if still applying force
+            if (aN > aMaxN){
+                aMaxN = aN
+            }
+            
+            //if pohone begins freefall
+            if (thrown(yeet:aN) && !up){
+                t0 = Int(Date().timeIntervalSince1970 * 1000)
+                up = true
+                if (!spinThrown(gN0: gPrevMag, gN1: gMag)){
+                    twirl = 0
+                    //todo: temp pause on gyro updates
+                }
+                //TODO: set label to indicate twirl
+                //TODO: INVERT DISPLAY COLORS
+            }
+            
+            //phone lands
+            if (up && landed(yeet: aN) && !spinThrown(gN0: gPrevMag, gN1: gMag)){
+                t1 = Int(Date().timeIntervalSince1970 * 1000)
+                a = t1 - t0 //airtime in ms hopefully
+                aLastMaxN = aMaxN //log max yeet of prev throw
+                //TODO: SET TEXT FILTER TO SHOW MAX YEET
+                aMaxN = 0
+                
+                //TODO: SAVE PREV THROW SOMEWHERE
+                
+                //TODO: CHECK FOR BEST AIRTIME
+                if (a > best){
+                    best = a
+                    //TODO: set best airtime onscreen somewhere
+                }
+                
+                //TODO: determine if throw meets quest parameters, win or lose
+                //TODO: UNINVERT COLORS
+                up = false
+                if (a > 50){
+                    myLabel.text=(
+                        "airtime: " + String(a) + //airtime is displaying werid
+                        "ms\ntwirl: " + String(format: "%f", twirl) +
+                        "\nyeet: " + String(format: "%f", aLastMaxN) +
+                        "\nbest airtime: " + String(best) + "ms"
+                    )
+                }
+            }
+            
+            /*
             myLabel.text=(
-                "x:" + String(format: "%f",(accelerometerData.acceleration.x)) +
-                "\ny:" + String(format: "%f",(accelerometerData.acceleration.y)) +
-                "\nz:" + String(format: "%f",(accelerometerData.acceleration.z)) +
-                "\nMANGITUDE:" + String( format: "%f",
-                    accelerometerData.acceleration.x * accelerometerData.acceleration.x +
-                    accelerometerData.acceleration.y * accelerometerData.acceleration.y +
-                    accelerometerData.acceleration.z * accelerometerData.acceleration.z
-                )
-            )
+                "x:" + String(format: "%f",aX) +
+                "\ny:" + String(format: "%f",aY) +
+                "\nz:" + String(format: "%f",aZ) +
+                "\nMANGITUDE:" + String( format: "%f", aN)
+            )*/
+             
         }
         if let gyroData = motionManager.gyroData {
             //print(motionManager.accelerometerData ?? 0, gyroData)
+            gX = gyroData.rotationRate.x
+            gY = gyroData.rotationRate.y
+            gZ = gyroData.rotationRate.z
+            
+            gPrevMag = gMag
+            gMag = ( gX*gX + gY*gY + gZ*gZ )
+            
+            //detect spinning throw
+            if (spinThrown(gN0: gMag, gN1: gPrevMag) && !up){
+                t0 = Int(Date().timeIntervalSince1970 * 1000)
+                twirl = gMag
+                //TODO: SET LABEL FOR TWIRL AMOUNT
+                //TODO: INVERT DISPLAY COLORS
+                up = true
+            }
         }
     }
+    
+    //if phone is probably falling
+    func thrown(yeet: Double) -> Bool{
+        return ((yeet < 0.025)); //this might have to change value depending on hopw accel is between ios and android
+    }
+    
+    //if phone is spinning at a consistent rate, it's probably not being supported externally
+    func spinThrown(gN0 : Double, gN1 : Double) -> Bool{
+        return ( ((gN1-gN0)/gN0 < 0.1) && (gN1 > 100))//might have to tweak the last constant here
+    }
+    
+    func landed(yeet: Double) -> Bool{
+        return ((yeet > 0.98)); //this might have to change value depending on hopw accel is between ios and android
+    }
+    
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .phone {
             return .allButUpsideDown
@@ -68,6 +157,7 @@ class GameViewController: UIViewController {
         }
     }
 
+    
     override var prefersStatusBarHidden: Bool {
         return true
     }
