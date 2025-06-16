@@ -37,6 +37,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
+                        <outlet property="myButton" destination="21C-SX-xuz" id="441-vg-fye"/>
                         <outlet property="myLabel" destination="zNt-S3-ucV" id="BwT-iq-MVD"/>
                     </connections>
                 </viewController>

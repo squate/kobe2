@@ -14,10 +14,12 @@ import CoreMotion
 
 class GameViewController: UIViewController {
     @IBOutlet weak var myLabel: UILabel! // This is your outlet
+    @IBOutlet weak var myButton: UIButton! // This is your outlet
+
     let motionManager = CMMotionManager()
     var timer: Timer!
     var up = false
-    var (t0, t1, a, best) = (0, 0, 0, 0) //times to ascertain throw air/ record
+    var (t0, t1, air, best) = (0, 0, 0, 0) //times to ascertain throw air/ record
     var (aX, aY, aZ) = (0.0, 0.0, 0.0) //accelerometer axes
     var (gX, gY, gZ) = (0.0, 0.0, 0.0) //gyroscope axes
     var (aN, aMaxN, aLastMaxN) = (0.0, 0.0, 0.0) //magnitude of accelerometer and related vars
@@ -65,7 +67,7 @@ class GameViewController: UIViewController {
                 aMaxN = aN
             }
             
-            //if pohone begins freefall
+            //if phone begins freefall
             if (thrown(yeet:aN) && !up){
                 t0 = Int(Date().timeIntervalSince1970 * 1000)
                 up = true
@@ -75,12 +77,13 @@ class GameViewController: UIViewController {
                 }
                 //TODO: set label to indicate twirl
                 //TODO: INVERT DISPLAY COLORS
+                myButton.tintColor = UIColor.orange
             }
             
             //phone lands
             if (up && landed(yeet: aN) && !spinThrown(gN0: gPrevMag, gN1: gMag)){
                 t1 = Int(Date().timeIntervalSince1970 * 1000)
-                a = t1 - t0 //airtime in ms hopefully
+                air = t1 - t0 //airtime in ms
                 aLastMaxN = aMaxN //log max yeet of prev throw
                 //TODO: SET TEXT FILTER TO SHOW MAX YEET
                 aMaxN = 0
@@ -88,18 +91,19 @@ class GameViewController: UIViewController {
                 //TODO: SAVE PREV THROW SOMEWHERE
                 
                 //TODO: CHECK FOR BEST AIRTIME
-                if (a > best){
-                    best = a
+                if (air > best){
+                    best = air
                     //TODO: set best airtime onscreen somewhere
                 }
                 
                 //TODO: determine if throw meets quest parameters, win or lose
                 //TODO: UNINVERT COLORS
+                myButton.tintColor = UIColor.black
                 up = false
-                if (a > 50){
+                if (air > 50){
                     myLabel.text=(
-                        "airtime: " + String(a) + //airtime is displaying werid
-                        "ms\ntwirl: " + String(format: "%f", twirl) +
+                        "airtime: " + String(air) + //airtime is displaying werid
+                        "ms\nspin: " + String(Int(twirl)) +
                         "\nyeet: " + String(format: "%f", aLastMaxN) +
                         "\nbest airtime: " + String(best) + "ms"
                     )
@@ -129,7 +133,16 @@ class GameViewController: UIViewController {
                 t0 = Int(Date().timeIntervalSince1970 * 1000)
                 twirl = gMag
                 //TODO: SET LABEL FOR TWIRL AMOUNT
-                //TODO: INVERT DISPLAY COLORS
+                //INVERT DISPLAY COLORS
+                myButton.tintColor = UIColor.orange
+                /*TODO: set tint until land in a way that doesn't constantly check.
+                 saucy responsive and efficient. noticeable on rapidly spinning device
+                options:
+                //color per axis,
+                //color per axis direction
+                //xyz -> rgb, twirl-> saturation, aNMax -> brightness)?
+                */
+
                 up = true
             }
         }
@@ -142,7 +155,7 @@ class GameViewController: UIViewController {
     
     //if phone is spinning at a consistent rate, it's probably not being supported externally
     func spinThrown(gN0 : Double, gN1 : Double) -> Bool{
-        return ( ((gN1-gN0)/gN0 < 0.1) && (gN1 > 100))//might have to tweak the last constant here
+        return (((gN1-gN0)/gN0 < 0.1) && (gN1 > 100))//might have to tweak the last constant here
     }
     
     func landed(yeet: Double) -> Bool{
